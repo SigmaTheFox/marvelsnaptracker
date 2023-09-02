@@ -21,8 +21,8 @@ module.exports = {
       name: '@electron-forge/publisher-github',
       config: {
         repository: {
-          owner: 'Razviar',
-          name: 'snaptracker',
+          owner: 'SigmaTheFox',
+          name: 'marvelsnaptracker',
         },
         prerelease: false,
         draft: false,
