@@ -1,4 +1,4 @@
-import format from 'date-fns/format';
+import {format} from 'date-fns';
 import {app} from 'electron';
 import {Stats, statSync} from 'fs';
 import {join} from 'path';
@@ -158,29 +158,34 @@ export class LogParser {
 				const data = await getJSONData(path);
 				const dataParsed = parseAsJSONIfNeeded(data);
 
-				//console.log(parsingMetadata.Variables);
-				Object.keys(parsingMetadata.Variables).forEach((Variable) => {
-					if (parsingMetadata.Variables[Variable][0] !== fileToParse) {
-						return;
-					}
-					const pathToVariableToExtract = parsingMetadata.Variables[Variable].slice(1);
-					const extractedElementToProcess = extractValue(dataParsed, pathToVariableToExtract) as any[];
-					//console.log('extractedElementToProcess', extractedElementToProcess);
-					switch (Variable) {
-						case 'PLAYER_ID':
-							extractedElementToProcess.forEach((extractedElement, i) => {
-								const extractedAccountId = extractValue(dataParsed, [...pathToVariableToExtract, i, 'AccountId']);
-								if (extractedAccountId && extractedAccountId === this.currentState.state.userId) {
-									variables[Variable] = i;
-									variables['OPPONENT_ID'] = i == 0 ? 1 : 0;
-									variables['PLAYER_NUM'] = i == 0 ? 1 : 2;
-									variables['OPPONENT_NUM'] = i == 0 ? 2 : 1;
-								}
-							});
-							break;
-					}
-					//variables[Variable] = extractedElementToProcess;
-				});
+        //console.log(parsingMetadata.Variables);
+        Object.keys(parsingMetadata.Variables).forEach((Variable) => {
+          if (parsingMetadata.Variables[Variable][0] !== fileToParse) {
+            return;
+          }
+          const pathToVariableToExtract = parsingMetadata.Variables[Variable].slice(1);
+          const extractedElementToProcess = extractValue(dataParsed, pathToVariableToExtract) as any[];
+          //console.log('extractedElementToProcess', extractedElementToProcess);
+          switch (Variable) {
+            case 'PLAYER_ID':
+              extractedElementToProcess.forEach((extractedElement, i) => {
+                const extractedAccountId = extractValue(dataParsed, [
+                  ...pathToVariableToExtract,
+                  i,
+                  'PlayerInfo',
+                  'AccountId',
+                ]);
+                if (extractedAccountId && extractedAccountId === this.currentState.state.userId) {
+                  variables[Variable] = i;
+                  variables['OPPONENT_ID'] = i == 0 ? 1 : 0;
+                  variables['PLAYER_NUM'] = i == 0 ? 1 : 2;
+                  variables['OPPONENT_NUM'] = i == 0 ? 2 : 1;
+                }
+              });
+              break;
+          }
+          //variables[Variable] = extractedElementToProcess;
+        });
 
 				//console.log('variables', variables);
 
